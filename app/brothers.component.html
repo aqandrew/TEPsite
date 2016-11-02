@@ -1,0 +1,15 @@
+<h2>
+	Brothers
+</h2>
+<!-- <p>
+	Temporary list of bros:
+</p>
+<ul>
+	<li *ngFor="let brother of brotherData">
+		{{ brother.firstName }} "{{ brother.pledgeName }}" {{ brother.lastName }}, {{ brother.brotherNumber }}
+	</li>
+</ul> -->
+ <org-chart [content]="brotherData"></org-chart>
+ <div class="error" *ngIf="errorMessage">
+	{{ errorMessage }}
+</div>
