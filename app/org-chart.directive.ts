@@ -1,11 +1,9 @@
 /*
-	This directive draws a Google Org Chart based on supplied fraternity info.
-	Credits to xavier268 on StackOverflow.
+	This directive draws a fraternity lineage chart based on supplied info.
+	Credits to Cyril Cherian on StackOverflow.
 */
 
 import { Directive, Input, ElementRef } from '@angular/core';
-
-//declare var google: any;
 
 @Directive({
 	selector: 'org-chart'
@@ -31,29 +29,10 @@ export class OrgChartDirective {
 		console.log('Constructing org-chart directive');
 		this.w = window;
 		this.el = elementRef.nativeElement; // elementRef cannot be used directly
-
-		let google = this.w.google;
-		//console.log('content.google is: ', google);
-
-		if (!this.w.google) {
-			console.error('The required Google script was not loaded.');
-		}
-		else {
-			console.log('You got the Google son!');
-		}
-
-		if (!this.w.google.visualization) {
-			console.error('no this.w.google.visualization');
-		}
-		else {
-			console.log('this.w.google.visualization is all gooood');
-		}
 	}
 
-	async draw() {
-		//console.log('this.w.google: ', this.w.google);
-		
-		let rows = [['brotherName', 'bigBrotherName', 'ToolTip']];
+	draw() {
+		let rows = [['brotherName', 'bigBrotherName']];
 
 		// TODO Ensure tree colors are inherited from big brother
 		for (let broIndex in this._content) {
@@ -64,33 +43,19 @@ export class OrgChartDirective {
 
 			// Don't designate a big brother for founders.
 			if (bro.pledgeClass == 'Founders') {
-				rows.push([displayName, '', 'ASUH DUDE']);
+				rows.push([displayName, '']);
 			}
 			else {
 				let bigBrother = this.getDisplayName(this.getBrotherById(bro.bigBrotherNumber));
 				//console.log('\tbigBrother is ' + bigBrother);
-				rows.push([displayName, bigBrother, 'asuh dude']);
+				rows.push([displayName, bigBrother]);
 			}
 		}
-
-		let data = this.w.google.visualization.arrayToDataTable(
-			rows,
-			false // designate first row as labels
-		);
 		
 		console.log(rows);
-		//console.log(data);
-		//data.setRowProperty(0, 'style', 'opacity: 0'); // only works with async draw
 
-		let options: any = {
-			allowHtml: true,
-			size: 'small'/*,
-			nodeClass: 'node'*/
-		};
-
-		// Instantiate and draw the chart using the specified options.
-		(new this.w.google.visualization.OrgChart(this.el))
-			.draw(data, options);
+		// TODO draw the chart using d3.js.
+		//(new this.w.google.visualization.OrgChart(this.el)).draw(data, options);
 	}
 
 	getBrotherById(id) {
@@ -105,9 +70,5 @@ export class OrgChartDirective {
 	getDisplayName(brother) {
 		//console.log('\tgetDisplayName.brother is ' + JSON.stringify(brother));
 		return brother.firstName + ' ' + brother.lastName + '\n\"' + brother.pledgeName + '\"';
-	}
-
-	sleep(ms) {
-		return new Promise(resolve => setTimeout(resolve, ms));
 	}
 }
