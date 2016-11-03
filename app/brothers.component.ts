@@ -20,16 +20,6 @@ export class BrothersComponent implements OnInit {
 
 	constructor (private brotherService: BrotherService, private _ngZone: NgZone) {
 		console.log('Constructing BrotherComponent');
-		/*window.angularComponentRef = {
-			component: this,
-			zone: _ngZone
-		};*/
-	}
-
-	getBrotherData(): void {
-		/*window.angularComponent.zone.run(() => {
-			
-		});*/
 	}
 
 	ngOnInit(): void {
