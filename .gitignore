@@ -1,4 +1,4 @@
 node_modules/
 /app/*.js
 /app/*.js.map
-/app/org-chart-component.ts
+/app/org-chart.directive.ts
