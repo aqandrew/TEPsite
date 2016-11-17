@@ -31,8 +31,9 @@ export class BrothersComponent implements OnInit {
 			'Yellow': '#cca328',
 			'Purple': '#4b2645',
 			'Red': '#a7000f',
-			'White':'#c19d7b',
-			'Orange':'#d14312'
+			'White': '#c19d7b',
+			'Orange': '#d14312',
+			'Silver': '#b3b3ad'
 		};
 	}
 
@@ -55,12 +56,6 @@ export class BrothersComponent implements OnInit {
 				data[b].pledgeClass = currentPledgeClass;
 			}
 		}
-
-		// TODO Ensure brothers with no option listed are given the corresponding founder's color.
-		var foundersOnly = data.filter(function (brother) { return brother.pledgeClass == 'Founders' });
-		foundersOnly.forEach(function (founder) {
-			console.log(founder.option);
-		});
 
 		//console.log('cleanBrotherData: ', data);
 		context.brotherData = data;
@@ -114,6 +109,9 @@ export class BrothersComponent implements OnInit {
 				})
 				.style('background-color', function (brother) {
 					return self.getFounderColor(brother);
+				})
+				.classed('silver-text', function (brother) {
+					return self.getFounderColor(brother) == self.colors['Black'];
 				});
 	}
 
@@ -121,6 +119,7 @@ export class BrothersComponent implements OnInit {
 		return this.brotherData.find(function (brother) { return brother.brotherNumber == id });
 	}
 
+	// TODO remove repeated calculations by assigning colors in cleanBrotherData
 	getFounderColor(brother) {
 		var tempBro = brother;
 
