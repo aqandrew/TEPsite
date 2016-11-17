@@ -64,7 +64,7 @@ export class BrothersComponent implements OnInit {
 
 		//console.log('cleanBrotherData: ', data);
 		context.brotherData = data;
-		context.drawBrotherBoards(data);
+		context.drawBrotherBoards();
 		return data;
 	}
 
@@ -93,7 +93,7 @@ export class BrothersComponent implements OnInit {
 				//error => this.errorMessage = <any>error);
 	}
 
-	drawBrotherBoards(brotherData) {
+	drawBrotherBoards() {
 		var self = this;
 
 		// set the dimensions and margins of the graph
@@ -101,40 +101,37 @@ export class BrothersComponent implements OnInit {
 			width = 960 - margin.left - margin.right,
 			height = 500 - margin.top - margin.bottom;
 
-		console.log('data parameter: ', brotherData);
+		console.log('data to draw brother boards: ', this.brotherData);
 
 		// TODO convert to SVG?
 		var boards = d3.select('#brothers')
 			.selectAll('div')
-				.data(brotherData)
+				.data(this.brotherData)
 				.enter()
 				.append('p')
 				.text(function (d) {
 					return JSON.stringify(d);
 				})
 				.style('background-color', function (brother) {
-					return self.getFounderColor(brother, brotherData);
+					return self.getFounderColor(brother);
 				});
 	}
 
-	getBrotherById(id, brotherData) {
-		//console.log('\tgetBrotherById.id is ' + id);
-		for (var broIndex = 0; broIndex < brotherData.length; broIndex++) {
-			if (brotherData[broIndex].brotherNumber == id) {
-				return brotherData[broIndex];
+	getBrotherById(id) {
+		for (var broIndex = 0; broIndex < this.brotherData.length; broIndex++) {
+			if (this.brotherData[broIndex].brotherNumber == id) {
+				return this.brotherData[broIndex];
 			}
 		}
 	}
 
-	getFounderColor(brother, brotherData) {
+	getFounderColor(brother) {
 		var tempBro = brother;
 
-		// This causes an infinite loop!
-		/*while (tempBro.bigBrotherNumber) {
-			tempBro = this.getBrotherById(brother.bigBrotherNumber, brotherData);
-		}*/
+		while (tempBro.bigBrotherNumber) {
+			tempBro = this.getBrotherById(tempBro.bigBrotherNumber);
+		}
 
-		//return this.colors[tempBro.option];
-		return this.colors['White']; // placeholder color
+		return this.colors[tempBro.option];
 	}
 }
