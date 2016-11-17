@@ -32,8 +32,7 @@ export class BrothersComponent implements OnInit {
 			'Purple': '#4b2645',
 			'Red': '#a7000f',
 			'White': '#c19d7b',
-			'Orange': '#d14312',
-			'Silver': '#b3b3ad'
+			'Orange': '#d14312'
 		};
 	}
 
@@ -90,29 +89,58 @@ export class BrothersComponent implements OnInit {
 
 	drawBrotherBoards() {
 		var self = this;
+		var h = 600;
 
 		// set the dimensions and margins of the graph
-		var margin = {top: 20, right: 20, bottom: 30, left: 50},
-			width = 960 - margin.left - margin.right,
-			height = 500 - margin.top - margin.bottom;
+
+		var svg = d3.select('#brothers')
+			.append('svg')
+				//.attr('height', h)
+				//.attr('height', '100%')
+				.attr('width', '100%');
+
+		var circles = svg.selectAll('circle')
+			.data(self.brotherData)
+			.enter()
+			.append('circle');
+
+		circles.attr('cx', '50%')
+			.attr('cy', function (brother, brotherIndex) {
+				return brotherIndex * 50 + 25;
+			})
+			.attr('r', 20)
+			.style('fill', function (brother) { return self.getFounderColor(brother) });
+
+		var names = svg.selectAll('text')
+			.data(self.brotherData)
+			.enter()
+			.append('text')
+				.text(function (brother) {
+					return brother.firstName + ' ' + brother.lastName;
+				})
+				.attr('x', '50%')
+				.attr('y', function (brother, brotherIndex) {
+					return brotherIndex * 50 + 25;
+				});
 
 		console.log('data to draw brother boards: ', this.brotherData);
 
-		// TODO convert to SVG?
-		var boards = d3.select('#brothers')
+		// TODO convert to SVG
+		/*var boards = d3.select('#brothers')
 			.selectAll('div')
-				.data(this.brotherData)
+				.data(self.brotherData)
 				.enter()
 				.append('p')
 				.text(function (d) {
 					return JSON.stringify(d);
 				})
+				// TODO assign background color with CSS classes
 				.style('background-color', function (brother) {
 					return self.getFounderColor(brother);
 				})
 				.classed('silver-text', function (brother) {
 					return self.getFounderColor(brother) == self.colors['Black'];
-				});
+				});*/
 	}
 
 	getBrotherById(id) {
