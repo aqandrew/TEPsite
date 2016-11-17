@@ -118,11 +118,7 @@ export class BrothersComponent implements OnInit {
 	}
 
 	getBrotherById(id) {
-		for (var broIndex = 0; broIndex < this.brotherData.length; broIndex++) {
-			if (this.brotherData[broIndex].brotherNumber == id) {
-				return this.brotherData[broIndex];
-			}
-		}
+		return this.brotherData.find(function (brother) { return brother.brotherNumber == id });
 	}
 
 	getFounderColor(brother) {
