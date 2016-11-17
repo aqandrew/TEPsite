@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { BrotherService } from './brother.service';
 import { Brother } from './brother';
@@ -6,6 +6,7 @@ import { OrgChartDirective } from './org-chart.directive';
 import { CORE_DIRECTIVES } from '@angular/common';
 
 declare var Papa: any;
+declare var d3: any;
 
 @Component({
 	selector: 'tepei-brothers',
@@ -16,10 +17,23 @@ declare var Papa: any;
 
 export class BrothersComponent implements OnInit {
 	errorMessage: string;
-	brotherData: Brother[];
+	brotherData: any;
+	colors: {};
 
-	constructor (private brotherService: BrotherService, private _ngZone: NgZone) {
+	constructor (private brotherService: BrotherService) {
 		console.log('Constructing BrotherComponent');
+		this.colors = {
+			'Magenta': '#a33558',
+			'Green': '#296f4a',
+			'Blue': '#224a6d',
+			'Black': '#120e0d',
+			'Pink': '#cb5966',
+			'Yellow': '#cca328',
+			'Purple': '#4b2645',
+			'Red': '#a7000f',
+			'White':'#c19d7b',
+			'Orange':'#d14312'
+		};
 	}
 
 	ngOnInit(): void {
@@ -42,8 +56,15 @@ export class BrothersComponent implements OnInit {
 			}
 		}
 
+		// TODO Ensure brothers with no option listed are given the corresponding founder's color.
+		var foundersOnly = data.filter(function (brother) { return brother.pledgeClass == 'Founders' });
+		foundersOnly.forEach(function (founder) {
+			console.log(founder.option);
+		});
+
 		//console.log('cleanBrotherData: ', data);
 		context.brotherData = data;
+		context.drawBrotherBoards(data);
 		return data;
 	}
 
@@ -70,5 +91,50 @@ export class BrothersComponent implements OnInit {
 				//brothers => this.brotherData = brothers,
 				function (error) { this.errorMessage = <any>error; });
 				//error => this.errorMessage = <any>error);
+	}
+
+	drawBrotherBoards(brotherData) {
+		var self = this;
+
+		// set the dimensions and margins of the graph
+		var margin = {top: 20, right: 20, bottom: 30, left: 50},
+			width = 960 - margin.left - margin.right,
+			height = 500 - margin.top - margin.bottom;
+
+		console.log('data parameter: ', brotherData);
+
+		// TODO convert to SVG?
+		var boards = d3.select('#brothers')
+			.selectAll('div')
+				.data(brotherData)
+				.enter()
+				.append('p')
+				.text(function (d) {
+					return JSON.stringify(d);
+				})
+				.style('background-color', function (brother) {
+					return self.getFounderColor(brother, brotherData);
+				});
+	}
+
+	getBrotherById(id, brotherData) {
+		//console.log('\tgetBrotherById.id is ' + id);
+		for (var broIndex = 0; broIndex < brotherData.length; broIndex++) {
+			if (brotherData[broIndex].brotherNumber == id) {
+				return brotherData[broIndex];
+			}
+		}
+	}
+
+	getFounderColor(brother, brotherData) {
+		var tempBro = brother;
+
+		// This causes an infinite loop!
+		/*while (tempBro.bigBrotherNumber) {
+			tempBro = this.getBrotherById(brother.bigBrotherNumber, brotherData);
+		}*/
+
+		//return this.colors[tempBro.option];
+		return this.colors['White']; // placeholder color
 	}
 }

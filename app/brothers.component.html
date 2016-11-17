@@ -9,8 +9,6 @@
 		{{ brother.firstName }} "{{ brother.pledgeName }}" {{ brother.lastName }}, {{ brother.brotherNumber }}
 	</li>
 </ul> -->
- <org-chart [content]="brotherData" class="org-chart"></org-chart>
- <!-- <div class="org-chart"></div> -->
- <div class="error" *ngIf="errorMessage">
+<div class="error" *ngIf="errorMessage">
 	{{ errorMessage }}
 </div>
