@@ -22,10 +22,20 @@ nav > li {
 	display: inline-block;
 }
 
+tepei-brothers {
+	width: 100%;
+}
+
+#brother-board {
+	overflow: scroll;
+	height: 600px;
+	width: 100%;
+	font-family: 'Permanent Marker', cursive;
+}
+
 /* TODO temporary values */
 svg {
-	height: 10000px;
-	overflow-y: scroll;
+	height: 2500px;
 }
 
 .magenta {
