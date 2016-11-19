@@ -128,7 +128,7 @@ export class BrothersComponent implements OnInit {
 		var divStyle = window.getComputedStyle(el, null).getPropertyValue('font-size');
 		var fontSize = parseFloat(divStyle); 
 
-		console.log('data to draw brother boards: ', this.brotherData);
+		//console.log('data to draw brother boards: ', this.brotherData);
 
 		var svg = d3.select('#brother-board')
 			.append('svg')
@@ -139,17 +139,35 @@ export class BrothersComponent implements OnInit {
 			.enter()
 				.append('g');
 
-		var branches = svg.selectAll('path.link')
-			.data(self.brotherData, function (brother) { return self.getBrotherById(brother.bigBrotherNumber) });
-
 		var rectangles = nodes.append('rect')
-			.attr('x', function (brother) { return (self.rectWidth + 10) * self.getFounderOffset(brother) })
+			.attr('x', function (brother) {
+				var x0 = (self.rectWidth + 10) * self.getFounderOffset(brother);
+				brother.x0 = x0;
+				return x0;
+			})
 			.attr('y', function (brother) {
-				return rectHeight * self.getPledgeClassHeight(brother) + 30;
+				var y0 = rectHeight * self.getPledgeClassHeight(brother) + 30;
+				brother.y0 = y0;
+				return y0;
 			})
 			.attr('width', self.rectWidth)
 			.attr('height', 20)
-			.style('fill', function (brother) { return self.getFounderColor(brother) });
+			.style('fill', function (brother) { return self.getFounderColor(brother); });
+		
+		var links = svg.selectAll('path.link')
+			.data(self.brotherData)
+			.enter()
+				.insert('path', 'g')
+				.attr('class', 'link')
+				.attr('d', function (brother) {
+					if (brother.pledgeClass != 'Founders') {
+						var bigBrother = self.getBigBrother(brother);
+						return 'M' + brother.x0 + ',' + brother.y0 +
+							'C' + (brother.x0 + bigBrother.x0) / 2 + ',' + brother.y0 +
+							' ' + (brother.x0 + bigBrother.x0) / 2 + ',' + bigBrother.y0 +
+							' ' + bigBrother.x0 + ',' + bigBrother.y0;
+					}
+				});
 
 		var names = nodes.append('text')
 			.text(function (brother) {
@@ -168,6 +186,10 @@ export class BrothersComponent implements OnInit {
 
 	getBrotherById (id) {
 		return this.brotherData.find(function (brother) { return brother.brotherNumber == id });
+	}
+
+	getBigBrother (brother) {
+		return this.getBrotherById(brother.bigBrotherNumber);
 	}
 
 	// TODO remove repeated calculations by assigning colors in cleanBrotherData

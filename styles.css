@@ -81,3 +81,8 @@ svg {
 .silver-text {
 	color: #b3b3ad;
 }
+
+.link {
+	stroke: black;
+	stroke-width: 3px;
+}
