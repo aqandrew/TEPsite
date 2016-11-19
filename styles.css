@@ -85,4 +85,5 @@ svg {
 .link {
 	stroke: black;
 	stroke-width: 3px;
+	fill: none;
 }

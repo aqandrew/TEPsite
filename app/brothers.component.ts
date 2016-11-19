@@ -141,7 +141,7 @@ export class BrothersComponent implements OnInit {
 
 		var rectangles = nodes.append('rect')
 			.attr('x', function (brother) {
-				var x0 = (self.rectWidth + 10) * self.getFounderOffset(brother);
+				var x0 = self.getHorizOffset(brother);
 				brother.x0 = x0;
 				return x0;
 			})
@@ -171,9 +171,11 @@ export class BrothersComponent implements OnInit {
 
 		var names = nodes.append('text')
 			.text(function (brother) {
-				return brother.firstName + ' ' + brother.lastName + ' ' + self.getBigDistance(brother);
+				return brother.firstName + ' ' + brother.lastName;
 			})
-			.attr('x', function (brother) { return (self.rectWidth + 10) * self.getFounderOffset(brother) + self.rectWidth / 2 })
+			.attr('x', function (brother) {
+				return self.getHorizOffset(brother) + self.rectWidth / 2; // to center text in rectangle
+				})
 			.attr('y', function (brother) {
 				return rectHeight * self.getPledgeClassHeight(brother) + 30 + fontSize;
 			})
@@ -257,5 +259,32 @@ export class BrothersComponent implements OnInit {
 		}
 
 		return this.isPcp(brother) ? pledgeClasses.length : pledgeClasses.length - 1;
+	}
+
+	getPledgeClass (brother) {
+		return this.brotherData.filter(function (someBrother) { return someBrother.pledgeClass == brother.pledgeClass; });
+	}
+
+	nthSameTreePledgeBro (brother) {
+		var self = this;
+		var sameTreePledgeBros = this.getPledgeClass(brother).filter(function (someBrother) {
+			return self.getFounderColor(someBrother) == self.getFounderColor(brother);
+		});
+
+		var n = 0;
+		while (n < sameTreePledgeBros.length) {
+			if (sameTreePledgeBros[n].brotherNumber == brother.brotherNumber) {
+				break;
+			}
+
+			n++;
+		}
+
+		return n;
+	}
+
+	getHorizOffset (brother) {
+		return (this.rectWidth + 10) * this.getFounderOffset(brother) +
+					((this.rectWidth / 2) * this.nthSameTreePledgeBro(brother));
 	}
 }
