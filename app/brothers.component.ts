@@ -19,21 +19,53 @@ export class BrothersComponent implements OnInit {
 	errorMessage: string;
 	brotherData: any;
 	colors: {};
+	rectWidth: number;
 
 	constructor (private brotherService: BrotherService) {
 		console.log('Constructing BrotherComponent');
 		this.colors = {
-			'Magenta': '#a33558',
-			'Green': '#296f4a',
-			'Blue': '#224a6d',
-			'Black': '#120e0d',
-			'Pink': '#cb5966',
-			'Yellow': '#cca328',
-			'Purple': '#4b2645',
-			'Red': '#a7000f',
-			'White': '#c19d7b',
-			'Orange': '#d14312'
+			'Magenta': {
+				'color': '#a33558',
+				'order': 0
+			},
+			'Green': {
+				'color': '#296f4a',
+				'order': 1
+			},
+			'Blue': {
+				'color': '#224a6d',
+				'order': 2
+			},
+			'Black': {
+				'color': '#120e0d',
+				'order': 3
+			},
+			'Pink': {
+				'color': '#cb5966',
+				'order': 4
+			},
+			'Yellow': {
+				'color': '#cca328',
+				'order': 5
+			},
+			'Purple': {
+				'color': '#4b2645',
+				'order': 6
+			},
+			'Red': {
+				'color': '#a7000f',
+				'order': 7
+			},
+			'White': {
+				'color': '#c19d7b',
+				'order': 8
+			},
+			'Orange':{ 
+				'color': '#d14312',
+				'order': 9
+			}
 		};
+		this.rectWidth = 150;
 	}
 
 	ngOnInit(): void {
@@ -74,7 +106,7 @@ export class BrothersComponent implements OnInit {
 		});
 	}
 
-	getBrothers() {
+	getBrothers () {
 		var self = this; // preserve calling context for interior of Observable.subscribe
 
 		this.brotherService.getBrothers()
@@ -87,43 +119,47 @@ export class BrothersComponent implements OnInit {
 				//error => this.errorMessage = <any>error);
 	}
 
-	drawBrotherBoards() {
+	drawBrotherBoards () {
 		var self = this;
 		var h = 600;
+		var rectHeight = 50;
+
+		console.log('data to draw brother boards: ', this.brotherData);
 
 		// set the dimensions and margins of the graph
 
-		var svg = d3.select('#brothers')
+		var svg = d3.select('#brother-board')
 			.append('svg')
 				//.attr('height', h)
-				//.attr('height', '100%')
-				.attr('width', '100%');
+				.attr('width', '1600');
 
-		var circles = svg.selectAll('circle')
+		var rectangles = svg.selectAll('rect')
 			.data(self.brotherData)
 			.enter()
-			.append('circle');
+			.append('rect');
 
-		circles.attr('cx', '50%')
-			.attr('cy', function (brother, brotherIndex) {
-				return brotherIndex * 50 + 25;
+		rectangles.attr('x', function (brother) { return (self.rectWidth + 10) * self.getFounderOffset(brother) })
+			.attr('y', function (brother) {
+				//return brotherIndex * rectHeight + 25;
+				return rectHeight * self.getPledgeClassHeight(brother) + 30;
 			})
-			.attr('r', 20)
+			.attr('width', self.rectWidth)
+			.attr('height', 20)
 			.style('fill', function (brother) { return self.getFounderColor(brother) });
 
 		var names = svg.selectAll('text')
 			.data(self.brotherData)
 			.enter()
 			.append('text')
-				.text(function (brother) {
+				.text(function (brother, brotherIndex) {
 					return brother.firstName + ' ' + brother.lastName;
 				})
-				.attr('x', '50%')
-				.attr('y', function (brother, brotherIndex) {
-					return brotherIndex * 50 + 25;
-				});
-
-		console.log('data to draw brother boards: ', this.brotherData);
+				.attr('x', function (brother) { return (self.rectWidth + 10) * self.getFounderOffset(brother) + self.rectWidth / 2 })
+				.attr('y', function (brother) {
+					//return brotherIndex * rectHeight + 25;
+					return rectHeight * self.getPledgeClassHeight(brother) + 30;
+				})
+				.attr('text-anchor', 'middle');
 
 		// TODO convert to SVG
 		/*var boards = d3.select('#brothers')
@@ -143,18 +179,48 @@ export class BrothersComponent implements OnInit {
 				});*/
 	}
 
-	getBrotherById(id) {
+	getBrotherById (id) {
 		return this.brotherData.find(function (brother) { return brother.brotherNumber == id });
 	}
 
 	// TODO remove repeated calculations by assigning colors in cleanBrotherData
-	getFounderColor(brother) {
+	getFounderColor (brother) {
 		var tempBro = brother;
 
 		while (tempBro.bigBrotherNumber) {
 			tempBro = this.getBrotherById(tempBro.bigBrotherNumber);
 		}
 
-		return this.colors[tempBro.option];
+		return this.colors[tempBro.option].color;
+	}
+
+	getFounderOffset (brother) {
+		var tempBro = brother;
+
+		while (tempBro.bigBrotherNumber) {
+			tempBro = this.getBrotherById(tempBro.bigBrotherNumber);
+		}
+
+		return this.colors[tempBro.option].order;
+	}
+
+	getPledgeClassHeight (brother) {
+		var pledgeClasses = [];
+
+		for (var i = 0; i < this.brotherData.indexOf(brother); i++) {
+			var thisPledgeClass = this.brotherData[i].pledgeClass;
+
+			if (!pledgeClasses.includes(thisPledgeClass)) {
+				pledgeClasses.push(thisPledgeClass);
+			}
+		}
+
+		return this.isPcp(brother)? pledgeClasses.length : pledgeClasses.length - 1;
+	}
+
+	isPcp (brother) {
+		var prevBrother = this.brotherData[this.brotherData.indexOf(brother) - 1];
+
+		return this.brotherData.indexOf(brother) == 0 || brother.pledgeClass != prevBrother.pledgeClass;
 	}
 }
