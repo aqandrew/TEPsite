@@ -124,9 +124,11 @@ export class BrothersComponent implements OnInit {
 		var h = 600;
 		var rectHeight = 50;
 
-		console.log('data to draw brother boards: ', this.brotherData);
+		var el = document.getElementById('brother-board');
+		var divStyle = window.getComputedStyle(el, null).getPropertyValue('font-size');
+		var fontSize = parseFloat(divStyle); 
 
-		// set the dimensions and margins of the graph
+		console.log('data to draw brother boards: ', this.brotherData);
 
 		var svg = d3.select('#brother-board')
 			.append('svg')
@@ -151,15 +153,19 @@ export class BrothersComponent implements OnInit {
 			.data(self.brotherData)
 			.enter()
 			.append('text')
-				.text(function (brother, brotherIndex) {
-					return brother.firstName + ' ' + brother.lastName;
+				.text(function (brother) {
+					return brother.firstName + ' ' + brother.lastName + ' ' + self.getBigDistance(brother);
 				})
 				.attr('x', function (brother) { return (self.rectWidth + 10) * self.getFounderOffset(brother) + self.rectWidth / 2 })
 				.attr('y', function (brother) {
 					//return brotherIndex * rectHeight + 25;
-					return rectHeight * self.getPledgeClassHeight(brother) + 30;
+					return rectHeight * self.getPledgeClassHeight(brother) + 30 + fontSize;
 				})
-				.attr('text-anchor', 'middle');
+				.attr('text-anchor', 'middle')
+				.attr('fill', function (brother) {
+					var isSilver = self.getFounderColor(brother) == self.colors['Black'].color;
+					return isSilver ? '#b3b3ad' : 'black';
+				});
 
 		// TODO convert to SVG
 		/*var boards = d3.select('#brothers')
@@ -185,23 +191,23 @@ export class BrothersComponent implements OnInit {
 
 	// TODO remove repeated calculations by assigning colors in cleanBrotherData
 	getFounderColor (brother) {
-		var tempBro = brother;
+		var someBro = brother;
 
-		while (tempBro.bigBrotherNumber) {
-			tempBro = this.getBrotherById(tempBro.bigBrotherNumber);
+		while (someBro.bigBrotherNumber) {
+			someBro = this.getBrotherById(someBro.bigBrotherNumber);
 		}
 
-		return this.colors[tempBro.option].color;
+		return this.colors[someBro.option].color;
 	}
 
 	getFounderOffset (brother) {
-		var tempBro = brother;
+		var someBro = brother;
 
-		while (tempBro.bigBrotherNumber) {
-			tempBro = this.getBrotherById(tempBro.bigBrotherNumber);
+		while (someBro.bigBrotherNumber) {
+			someBro = this.getBrotherById(someBro.bigBrotherNumber);
 		}
 
-		return this.colors[tempBro.option].order;
+		return this.colors[someBro.option].order;
 	}
 
 	getPledgeClassHeight (brother) {
@@ -222,5 +228,31 @@ export class BrothersComponent implements OnInit {
 		var prevBrother = this.brotherData[this.brotherData.indexOf(brother) - 1];
 
 		return this.brotherData.indexOf(brother) == 0 || brother.pledgeClass != prevBrother.pledgeClass;
+	}
+
+	getBigDistance (brother) {
+		if (!brother.bigBrotherNumber) {
+			return 0;
+		}
+
+		var bigBrother = this.getBrotherById(brother.bigBrotherNumber);
+		var prevBrother = this.brotherData[this.brotherData.indexOf(brother) - 1];
+
+		var pledgeClasses = [];
+		while (true) {
+			var thisPledgeClass = prevBrother.pledgeClass;
+
+			if (!pledgeClasses.includes(thisPledgeClass)) {
+				pledgeClasses.push(thisPledgeClass);
+			}
+
+			if (thisPledgeClass == bigBrother.pledgeClass) {
+				break;
+			}
+
+			prevBrother = this.brotherData[this.brotherData.indexOf(prevBrother) - 1];
+		}
+
+		return this.isPcp(brother) ? pledgeClasses.length : pledgeClasses.length - 1;
 	}
 }
