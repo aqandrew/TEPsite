@@ -132,57 +132,38 @@ export class BrothersComponent implements OnInit {
 
 		var svg = d3.select('#brother-board')
 			.append('svg')
-				//.attr('height', h)
 				.attr('width', '1600');
 
-		var rectangles = svg.selectAll('rect')
+		var nodes = svg.selectAll('g.node')
 			.data(self.brotherData)
 			.enter()
-			.append('rect');
+				.append('g');
 
-		rectangles.attr('x', function (brother) { return (self.rectWidth + 10) * self.getFounderOffset(brother) })
+		var branches = svg.selectAll('path.link')
+			.data(self.brotherData, function (brother) { return self.getBrotherById(brother.bigBrotherNumber) });
+
+		var rectangles = nodes.append('rect')
+			.attr('x', function (brother) { return (self.rectWidth + 10) * self.getFounderOffset(brother) })
 			.attr('y', function (brother) {
-				//return brotherIndex * rectHeight + 25;
 				return rectHeight * self.getPledgeClassHeight(brother) + 30;
 			})
 			.attr('width', self.rectWidth)
 			.attr('height', 20)
 			.style('fill', function (brother) { return self.getFounderColor(brother) });
 
-		var names = svg.selectAll('text')
-			.data(self.brotherData)
-			.enter()
-			.append('text')
-				.text(function (brother) {
-					return brother.firstName + ' ' + brother.lastName + ' ' + self.getBigDistance(brother);
-				})
-				.attr('x', function (brother) { return (self.rectWidth + 10) * self.getFounderOffset(brother) + self.rectWidth / 2 })
-				.attr('y', function (brother) {
-					//return brotherIndex * rectHeight + 25;
-					return rectHeight * self.getPledgeClassHeight(brother) + 30 + fontSize;
-				})
-				.attr('text-anchor', 'middle')
-				.attr('fill', function (brother) {
-					var isSilver = self.getFounderColor(brother) == self.colors['Black'].color;
-					return isSilver ? '#b3b3ad' : 'black';
-				});
-
-		// TODO convert to SVG
-		/*var boards = d3.select('#brothers')
-			.selectAll('div')
-				.data(self.brotherData)
-				.enter()
-				.append('p')
-				.text(function (d) {
-					return JSON.stringify(d);
-				})
-				// TODO assign background color with CSS classes
-				.style('background-color', function (brother) {
-					return self.getFounderColor(brother);
-				})
-				.classed('silver-text', function (brother) {
-					return self.getFounderColor(brother) == self.colors['Black'];
-				});*/
+		var names = nodes.append('text')
+			.text(function (brother) {
+				return brother.firstName + ' ' + brother.lastName + ' ' + self.getBigDistance(brother);
+			})
+			.attr('x', function (brother) { return (self.rectWidth + 10) * self.getFounderOffset(brother) + self.rectWidth / 2 })
+			.attr('y', function (brother) {
+				return rectHeight * self.getPledgeClassHeight(brother) + 30 + fontSize;
+			})
+			.attr('text-anchor', 'middle')
+			.attr('fill', function (brother) {
+				var isSilver = self.getFounderColor(brother) == self.colors['Black'].color;
+				return isSilver ? '#b3b3ad' : 'black';
+			});
 	}
 
 	getBrotherById (id) {
