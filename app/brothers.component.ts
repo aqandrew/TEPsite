@@ -143,7 +143,8 @@ export class BrothersComponent implements OnInit {
 							' ' + (brother.x0 + bigBrother.x0) / 2 + ',' + bigBrother.y0 +
 							' ' + bigBrother.x0 + ',' + bigBrother.y0;
 					}
-				});
+				})
+				.attr('transform', 'translate(' + self.rectWidth / 2 + ')'); // centered with respect to each rectangle
 
 		var names = nodes.append('text')
 			.text(function (brother) {
