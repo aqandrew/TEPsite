@@ -18,53 +18,12 @@ declare var d3: any;
 export class BrothersComponent implements OnInit {
 	errorMessage: string;
 	brotherData: any;
-	colors: {};
+	colors: string[];
 	rectWidth: number;
 
 	constructor (private brotherService: BrotherService) {
 		console.log('Constructing BrotherComponent');
-		this.colors = {
-			'Magenta': {
-				'color': '#a33558',
-				'order': 0
-			},
-			'Green': {
-				'color': '#296f4a',
-				'order': 1
-			},
-			'Blue': {
-				'color': '#224a6d',
-				'order': 2
-			},
-			'Black': {
-				'color': '#120e0d',
-				'order': 3
-			},
-			'Pink': {
-				'color': '#cb5966',
-				'order': 4
-			},
-			'Yellow': {
-				'color': '#cca328',
-				'order': 5
-			},
-			'Purple': {
-				'color': '#4b2645',
-				'order': 6
-			},
-			'Red': {
-				'color': '#a7000f',
-				'order': 7
-			},
-			'White': {
-				'color': '#c19d7b',
-				'order': 8
-			},
-			'Orange':{ 
-				'color': '#d14312',
-				'order': 9
-			}
-		};
+		this.colors = ['Magenta', 'Green', 'Blue', 'Black', 'Pink', 'Yellow', 'Purple', 'Red', 'White', 'Orange'];
 		this.rectWidth = 150;
 	}
 
@@ -75,7 +34,7 @@ export class BrothersComponent implements OnInit {
 	// data is usable here
 	cleanBrotherData (context, data) {
 		// Remove depledges.
-		data = data.filter(function (person) { return person.option != 'Depledge' });
+		data = data.filter(function (person) { return person.option != 'Depledge'; });
 
 		// Ensure brothers with no pledge class listed are given the PCP's pledge class.
 		var currentPledgeClass = '';
@@ -86,9 +45,21 @@ export class BrothersComponent implements OnInit {
 			else {
 				data[b].pledgeClass = currentPledgeClass;
 			}
+
+			// Ensure brothers with no color are given their respective founder's color.
+			// TODO remove repeated calculations
+			if (!data[b].option) {
+				var someBro = data[b];
+
+				while (someBro.bigBrotherNumber) {
+					someBro = data.find(function (anotherBrother) { return someBro.bigBrotherNumber == anotherBrother.brotherNumber; });
+				}
+
+				data[b].option = someBro.option;
+			}
 		}
 
-		//console.log('cleanBrotherData: ', data);
+		console.log('cleanBrotherData: ', data);
 		context.brotherData = data;
 		context.drawBrotherBoards();
 		return data;
@@ -132,7 +103,12 @@ export class BrothersComponent implements OnInit {
 
 		var svg = d3.select('#brother-board')
 			.append('svg')
-				.attr('width', '1600');
+				.attr('width', 1600);
+
+		var background = svg.append('rect')
+			.attr('height', 2500) // TODO temporary values
+			.attr('width', 1600)
+			.style('fill', '#dde2eb');
 
 		var nodes = svg.selectAll('g.node')
 			.data(self.brotherData)
@@ -152,7 +128,7 @@ export class BrothersComponent implements OnInit {
 			})
 			.attr('width', self.rectWidth)
 			.attr('height', 20)
-			.style('fill', function (brother) { return self.getFounderColor(brother); });
+			.attr('class', function (brother) { return brother.option.toLowerCase(); });
 		
 		var links = svg.selectAll('path.link')
 			.data(self.brotherData)
@@ -181,7 +157,7 @@ export class BrothersComponent implements OnInit {
 			})
 			.attr('text-anchor', 'middle')
 			.attr('fill', function (brother) {
-				var isSilver = self.getFounderColor(brother) == self.colors['Black'].color;
+				var isSilver = brother.option == 'Black';
 				return isSilver ? '#b3b3ad' : 'black';
 			});
 	}
@@ -194,25 +170,8 @@ export class BrothersComponent implements OnInit {
 		return this.getBrotherById(brother.bigBrotherNumber);
 	}
 
-	// TODO remove repeated calculations by assigning colors in cleanBrotherData
-	getFounderColor (brother) {
-		var someBro = brother;
-
-		while (someBro.bigBrotherNumber) {
-			someBro = this.getBrotherById(someBro.bigBrotherNumber);
-		}
-
-		return this.colors[someBro.option].color;
-	}
-
-	getFounderOffset (brother) {
-		var someBro = brother;
-
-		while (someBro.bigBrotherNumber) {
-			someBro = this.getBrotherById(someBro.bigBrotherNumber);
-		}
-
-		return this.colors[someBro.option].order;
+	getTreeOffset (brother) {
+		return this.colors.indexOf(brother.option);
 	}
 
 	getPledgeClassHeight (brother) {
@@ -268,7 +227,7 @@ export class BrothersComponent implements OnInit {
 	nthSameTreePledgeBro (brother) {
 		var self = this;
 		var sameTreePledgeBros = this.getPledgeClass(brother).filter(function (someBrother) {
-			return self.getFounderColor(someBrother) == self.getFounderColor(brother);
+			return someBrother.option == brother.option;
 		});
 
 		var n = 0;
@@ -284,7 +243,7 @@ export class BrothersComponent implements OnInit {
 	}
 
 	getHorizOffset (brother) {
-		return (this.rectWidth + 10) * this.getFounderOffset(brother) +
+		return (this.rectWidth + 10) * this.getTreeOffset(brother) +
 					((this.rectWidth / 2) * this.nthSameTreePledgeBro(brother));
 	}
 }

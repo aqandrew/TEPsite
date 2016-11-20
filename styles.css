@@ -15,7 +15,7 @@ body {
 	text-align: justify;
 	font-weight: lighter;
 	font-family: 'Lato', sans-serif;
-	/*background-color: #B57EDC;*/
+	/*fill: #B57EDC;*/
 }
 
 nav > li {
@@ -39,43 +39,43 @@ svg {
 }
 
 .magenta {
-	background-color: #a33558;
+	fill: #a33558;
 }
 
 .green {
-	background-color: #296f4a;
+	fill: #296f4a;
 }
 
 .blue {
-	background-color: #224a6d;
+	fill: #224a6d;
 }
 
 .black {
-	background-color: #120e0d;
+	fill: #120e0d;
 }
 
 .pink {
-	background-color: #cb5966;
+	fill: #cb5966;
 }
 
 .yellow {
-	background-color: #cca328;
+	fill: #cca328;
 }
 
 .purple {
-	background-color: #4b2645;
+	fill: #4b2645;
 }
 
 .red {
-	background-color: #a7000f;
+	fill: #a7000f;
 }
 
 .white {
-	background-color: #c19d7b;
+	fill: #c19d7b;
 }
 
 .orange {
-	background-color: #d14312;
+	fill: #d14312;
 }
 
 .silver-text {
