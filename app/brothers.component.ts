@@ -156,9 +156,9 @@ export class BrothersComponent implements OnInit {
 				return rectHeight * self.getPledgeClassHeight(brother) + 30 + fontSize;
 			})
 			.attr('text-anchor', 'middle')
-			.attr('fill', function (brother) {
+			.attr('class', function (brother) {
 				var isSilver = brother.option == 'Black';
-				return isSilver ? '#b3b3ad' : 'black';
+				return isSilver ? 'silver-text' : 'black';
 			});
 	}
 
