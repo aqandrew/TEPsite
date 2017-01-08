@@ -20,11 +20,15 @@ export class BrothersComponent implements OnInit {
 	brotherData: any;
 	colors: string[];
 	rectWidth: number;
+	rectSpacingX: number;
+	rectSpacingY: number;
 
 	constructor (private brotherService: BrotherService) {
-		console.log('Constructing BrotherComponent');
+		//console.log('Constructing BrotherComponent');
 		this.colors = ['Magenta', 'Green', 'Blue', 'Black', 'Pink', 'Yellow', 'Purple', 'Red', 'White', 'Orange'];
 		this.rectWidth = 150;
+		this.rectSpacingX = 10;
+		this.rectSpacingY = 30;
 	}
 
 	ngOnInit(): void {
@@ -122,7 +126,7 @@ export class BrothersComponent implements OnInit {
 				return x0;
 			})
 			.attr('y', function (brother) {
-				var y0 = rectHeight * self.getPledgeClassHeight(brother) + 30;
+				var y0 = rectHeight * (self.getPledgeClassHeight(brother) /*+ self.getBigDistance(brother)*/) + self.rectSpacingY;
 				brother.y0 = y0;
 				return y0;
 			})
@@ -148,19 +152,27 @@ export class BrothersComponent implements OnInit {
 
 		var names = nodes.append('text')
 			.text(function (brother) {
+				// TODO add pledge names
 				return brother.firstName + ' ' + brother.lastName;
 			})
 			.attr('x', function (brother) {
 				return self.getHorizOffset(brother) + self.rectWidth / 2; // to center text in rectangle
 				})
 			.attr('y', function (brother) {
-				return rectHeight * self.getPledgeClassHeight(brother) + 30 + fontSize;
+				return rectHeight * self.getPledgeClassHeight(brother) + self.rectSpacingY + fontSize;
 			})
 			.attr('text-anchor', 'middle')
 			.attr('class', function (brother) {
 				var isSilver = brother.option == 'Black';
 				return isSilver ? 'silver-text' : 'black';
 			});
+
+		// Matthew Nelson, 336 should be 2
+		//debugger;
+		for (let i = 0; i < self.brotherData.length; i++) {
+			let testBrother = self.brotherData[i]; // Dan Flaherty, 328, should be 1
+			console.log(testBrother.firstName + ' ' + testBrother.lastName + ' bigDistance: ' + self.getBigDistance(testBrother));
+		}
 	}
 
 	getBrotherById (id) {
@@ -244,7 +256,7 @@ export class BrothersComponent implements OnInit {
 	}
 
 	getHorizOffset (brother) {
-		return (this.rectWidth + 10) * this.getTreeOffset(brother) +
-					((this.rectWidth / 2) * this.nthSameTreePledgeBro(brother));
+		return (this.rectWidth + this.rectSpacingX) * this.getTreeOffset(brother) +
+					(this.rectWidth / 2) * this.nthSameTreePledgeBro(brother);
 	}
 }
