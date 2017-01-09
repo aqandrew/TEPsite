@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { BrotherService } from './brother.service';
 import { Brother } from './brother';
-import { OrgChartDirective } from './org-chart.directive';
 import { CORE_DIRECTIVES } from '@angular/common';
 
 declare var Papa: any;
@@ -12,7 +11,7 @@ declare var d3: any;
 	selector: 'tepei-brothers',
 	templateUrl: 'app/brothers.component.html',
 	providers: [BrotherService],
-	directives: [OrgChartDirective, CORE_DIRECTIVES]
+	directives: [CORE_DIRECTIVES]
 })
 
 export class BrothersComponent implements OnInit {
@@ -65,6 +64,10 @@ export class BrothersComponent implements OnInit {
 
 		console.log('cleanBrotherData: ', data);
 		context.brotherData = data;
+
+		context.phylogeneticTrees = 'hoopla!';
+		console.log(context.phylogeneticTrees);
+
 		context.drawBrotherBoards();
 		return data;
 	}
