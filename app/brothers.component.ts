@@ -21,6 +21,7 @@ export class BrothersComponent implements OnInit {
 	rectWidth: number;
 	rectSpacingX: number;
 	rectSpacingY: number;
+	phyloTrees: string[];
 
 	constructor (private brotherService: BrotherService) {
 		//console.log('Constructing BrotherComponent');
@@ -64,10 +65,7 @@ export class BrothersComponent implements OnInit {
 
 		console.log('cleanBrotherData: ', data);
 		context.brotherData = data;
-
-		context.phylogeneticTrees = 'hoopla!';
-		console.log(context.phylogeneticTrees);
-
+		context.constructPhyloTrees();
 		context.drawBrotherBoards();
 		return data;
 	}
@@ -95,6 +93,27 @@ export class BrothersComponent implements OnInit {
 				//brothers => this.brotherData = brothers,
 				function (error) { this.errorMessage = <any>error; });
 				//error => this.errorMessage = <any>error);
+	}
+
+	constructPhyloTrees() {
+		this.phyloTrees = [];
+		let founders = this.brotherData.slice(0, 10);
+		for (let founderNum = 0; founderNum < founders.length; founderNum++) {
+			let newickTreeText = this.writeNewickString(founders[founderNum]);
+			this.phyloTrees.push(newickTreeText);
+		}
+
+		console.log(this.phyloTrees);
+	}
+
+	writeNewickString(brother) {
+		let hisLittles = this.getLittles(brother);
+		let nodeRepresentation = someBrother => someBrother.brotherNumber + (!someBrother.bigBrotherNumber ? '' : ':' + this.getBigDistance(someBrother));
+		return !hisLittles.length ? nodeRepresentation(brother) : '(' + hisLittles.map(someBrother => this.writeNewickString(someBrother) ).join(',') + ')' + nodeRepresentation(brother);
+	}
+
+	getLittles(brother) {
+		return this.brotherData.filter((someBrother) => { return someBrother.bigBrotherNumber == brother.brotherNumber; });
 	}
 
 	drawBrotherBoards () {
@@ -172,10 +191,10 @@ export class BrothersComponent implements OnInit {
 
 		// Matthew Nelson, 336 should be 2
 		//debugger;
-		for (let i = 0; i < self.brotherData.length; i++) {
-			let testBrother = self.brotherData[i]; // Dan Flaherty, 328, should be 1
-			console.log(testBrother.firstName + ' ' + testBrother.lastName + ' bigDistance: ' + self.getBigDistance(testBrother));
-		}
+		// for (let i = 0; i < self.brotherData.length; i++) {
+		// 	let testBrother = self.brotherData[i]; // Dan Flaherty, 328, should be 1
+		// 	console.log(testBrother.firstName + ' ' + testBrother.lastName + ' bigDistance: ' + self.getBigDistance(testBrother));
+		// }
 	}
 
 	getBrotherById (id) {
