@@ -187,6 +187,7 @@ export class BrothersComponent implements OnInit {
 				.each(function(d) { d.target.linkExtensionNode = this; })
 				.attr("d", linkExtensionConstant);
 
+		// TODO change links from triangles to rectangular strokes
 		var link = chart.append("g")
 			.attr("class", "links")
 			.selectAll("path")
@@ -196,10 +197,11 @@ export class BrothersComponent implements OnInit {
 				.attr("d", linkConstant)
 				.attr("stroke", function(d) { return d.target.color; });
 
+		// TODO align non-leaf brother names with correct radius
 		chart.append("g")
 			.attr("class", "labels")
 			.selectAll("text")
-			.data(root.leaves())
+			.data(root.descendants())
 			.enter().append("text")
 				.attr("dy", ".31em")
 				.attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + (innerRadius + 4) + ",0)" + (d.x < 180 ? "" : "rotate(180)"); })
