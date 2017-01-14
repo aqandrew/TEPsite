@@ -87,3 +87,33 @@ svg {
 	stroke-width: 3px;
 	fill: none;
 }
+
+/* mbostock's Tree of Life */
+
+.links {
+  fill: none;
+  stroke: #000;
+}
+
+.link-extensions {
+  fill: none;
+  stroke: #000;
+  stroke-opacity: .25;
+}
+
+.labels {
+  font: 10px sans-serif;
+}
+
+.link--active {
+  stroke: #000 !important;
+  stroke-width: 1.5px;
+}
+
+.link-extension--active {
+  stroke-opacity: .6;
+}
+
+.label--active {
+  font-weight: bold;
+}

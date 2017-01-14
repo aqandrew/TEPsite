@@ -187,7 +187,6 @@ export class BrothersComponent implements OnInit {
 				.each(function(d) { d.target.linkExtensionNode = this; })
 				.attr("d", linkExtensionConstant);
 
-		// TODO change links from triangles to rectangular strokes
 		var link = chart.append("g")
 			.attr("class", "links")
 			.selectAll("path")
